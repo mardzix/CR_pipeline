@@ -12,7 +12,7 @@ import fnmatch
 import argparse
 from datetime import datetime
 
-
+print("Hello world")
 
 
 parser = argparse.ArgumentParser("Cut and run pipeline")
