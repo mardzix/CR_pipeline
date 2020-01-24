@@ -18,10 +18,10 @@ parser.add_argument("-i","--input",dest="input",type=str,help="Path to input fil
 parser.add_argument("-p","--pattern",dest="pattern",type=str,help="Regexp pattern for which the script should look for")
 parser.add_argument("-o","--output",dest="out",type=str,help="Output folder")
 parser.add_argument("-n","--name",dest="name",type=str,help="Name of the experiment",default=False)
-
 args = parser.parse_args()
 
 CR_PATH = "/".join(os.path.abspath(__file__).split("/")[0:-1])
+
 FASTQ_PATH      = args.input    #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/raw/P13556_1001/02-FASTQ/190625_A00621_0091_BHCKNLDRXX/"
 PATTERN         = args.pattern   #"P13556*.fastq.gz"
 OUTDIR          = args.out       #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/CR_pipeline_MB/"
@@ -259,10 +259,8 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   sys.stderr.write("*** {0} *** MB_pipeline: Generating bigwig files {1} using bamCoverage from {2} \n".format(datetime.now(),EXPERIMENT_NAME, DEEPTOOLS))    
   
   os.system(BIGWIG_CMD1)  
-#  os.system(BIGWIG_CMD2)  
   os.system(BIGWIG_CMD3)
   os.system(BIGWIG_CMD4)
-#  os.system(BIGWIG_CMD5)
   os.system(BIGWIG_CMD6)
   
   if not os.path.exists("{}/macs/".format(OUTDIR)):
