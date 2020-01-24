@@ -21,13 +21,7 @@ parser.add_argument("-n","--name",dest="name",type=str,help="Name of the experim
 
 args = parser.parse_args()
 
-CR_PATH = os.path.abspath(__file__)
-
-#sys.stdout.write(args.input)
-#sys.stdout.write(args.pattern)
-#sys.stdout.write(args.out)
-#sys.exit(1)
-
+CR_PATH = "/".join(os.path.abspath(__file__).split("/")[0:-1])
 FASTQ_PATH      = args.input    #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/raw/P13556_1001/02-FASTQ/190625_A00621_0091_BHCKNLDRXX/"
 PATTERN         = args.pattern   #"P13556*.fastq.gz"
 OUTDIR          = args.out       #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/CR_pipeline_MB/"
@@ -133,7 +127,7 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                                                                                                                       ADAPTER_PATH,
                                                                                                                                       NTHREADS)
   sys.stderr.write("*** {0} ***MB_pipeline: Performing trimming using {1}\n".format(datetime.now(),TRIMMOMATIC))
-  os.system(TRIM_CMD)
+  #os.system(TRIM_CMD)
   
   #############
   # Alignment #
@@ -173,11 +167,11 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   SPIKEIN_COUNT        = "samtools view -q 1 -f 2 {0}/bowtie2_align/{1}_spikein.bam | wc -l > {0}/bowtie2_align/{1}_spikein_norm.txt".format(OUTDIR,EXPERIMENT_NAME)
   
   sys.stderr.write("*** {0} *** MB_pipeline: Mapping trimmed reads with {1}\n".format(datetime.now(),BOWTIE2))
-  os.system(BOWTIE_CMD)
+  #os.system(BOWTIE_CMD)
   sys.stderr.write("*** {0} *** MB_pipeline: Mapping trimmed reads to the spike-in genome with {1}\n".format(datetime.now(),BOWTIE2))
-  os.system(BOWTIE_SPIKEIN)
+  #os.system(BOWTIE_SPIKEIN)
   sys.stderr.write("*** {0} *** MB_pipeline: Calculating spike-in normalisation factor {1}\n".format(datetime.now(),BOWTIE2))
-  os.system(SPIKEIN_COUNT)
+  #os.system(SPIKEIN_COUNT)
   
   #####################################
   # PICARD MANIPULATIONS OF BAM FILES #
@@ -206,16 +200,16 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                                                                    EXPERIMENT_NAME)
   
   sys.stderr.write("*** {0} *** MB_pipeline: Sorting bam files {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  os.system(PICARD_SORT)
+  #os.system(PICARD_SORT)
   sys.stderr.write("*** {0} *** MB_pipeline: Marking duplicates {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  os.system(PICARD_MARK)
+  #os.system(PICARD_MARK)
   sys.stderr.write("*** {0} *** MB_pipeline: Removing duplicates {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  os.system(PICARD_REMOVE_DUP)
+  #os.system(PICARD_REMOVE_DUP)
   
   
-  SAMTOOLS_120_FILTER_CMD          = "samtools view -h {0}/bowtie2_align/sorted/{1}_sorted.bam | awk -f {3}bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_sorted_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE,CR_PATH)
-  SAMTOOLS_120_FILTER_CMD_MARKED   = "samtools view -h {0}/bowtie2_align/sorted/{1}_marked-dup.bam | awk -f {3}bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
-  SAMTOOLS_120_FILTER_CMD_DEDUP    = "samtools view -h {0}/bowtie2_align/sorted/{1}_dedup.bam | awk -f {3}bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
+  SAMTOOLS_120_FILTER_CMD          = "samtools view -h {0}/bowtie2_align/sorted/{1}_sorted.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_sorted_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE,CR_PATH)
+  SAMTOOLS_120_FILTER_CMD_MARKED   = "samtools view -h {0}/bowtie2_align/sorted/{1}_marked-dup.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
+  SAMTOOLS_120_FILTER_CMD_DEDUP    = "samtools view -h {0}/bowtie2_align/sorted/{1}_dedup.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
   
   
   sys.stderr.write("*** {0} *** MB_pipeline: Extracting reads < 120 bp from {1} with {2} \n".format(datetime.now(),EXPERIMENT_NAME, SAMTOOLS))
@@ -368,14 +362,14 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   os.system(SUMMITS_PADDED_GETFASTA_CMD)
 
   # Filte N and lower case atcg contatining fasta entries
-  FILTER_FA_CMD = "python {4}bin/filter.py {0}/{3}/{1}_summits_padded.fa 300 > {0}/{3}/{1}_summits_repeats.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,,CR_PATH)
+  FILTER_FA_CMD = "python {4}/bin/filter.py {0}/{3}/{1}_summits_padded.fa 300 > {0}/{3}/{1}_summits_repeats.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,CR_PATH)
   os.system(FILTER_FA_CMD)
 
   SUMMITS_FILTER_CMD = "bedops -n 1 {0}/{2}/{1}_summits.bed {0}/{3}/{1}_summits_repeats.bed | sort-bed - > {0}/{3}/{1}_summits_filtered.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
   os.system(SUMMITS_FILTER_CMD)
 
   # Filter blacklisted regions
-  FINAL_SUMMIT_FILTER_CMD = "cat {0}/{3}/{1}_summits_filtered.bed | grep -v -e 'chrM' | sort-bed - | bedops -n 1 - {5}bin/blacklist/{4}.blacklist.bed > {0}/{3}/{1}_summits_filtered_final.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME,CR_PATH)
+  FINAL_SUMMIT_FILTER_CMD = "cat {0}/{3}/{1}_summits_filtered.bed | grep -v -e 'chrM' | sort-bed - | bedops -n 1 - {5}/bin/blacklist/{4}.blacklist.bed > {0}/{3}/{1}_summits_filtered_final.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME,CR_PATH)
   os.system(FINAL_SUMMIT_FILTER_CMD)
 
   # Get 1000 random peaks from top 5000 peaks
@@ -435,14 +429,14 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   os.system(SUMMITS_PADDED_GETFASTA_CMD)
 
   # Filte N and lower case atcg contatining fasta entries
-  FILTER_FA_CMD = "python {4}bin/filter.py {0}/{3}/{1}_summits_padded.fa 300 > {0}/{3}/{1}_summits_repeats.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,CR_PATH)
+  FILTER_FA_CMD = "python {4}/bin/filter.py {0}/{3}/{1}_summits_padded.fa 300 > {0}/{3}/{1}_summits_repeats.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,CR_PATH)
   os.system(FILTER_FA_CMD)
 
   SUMMITS_FILTER_CMD = "bedops -n 1 {0}/{2}/{1}_summits.bed {0}/{3}/{1}_summits_repeats.bed | sort-bed - > {0}/{3}/{1}_summits_filtered.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
   os.system(SUMMITS_FILTER_CMD)
 
   # Filter blacklisted regions
-  FINAL_SUMMIT_FILTER_CMD = "cat {0}/{3}/{1}_summits_filtered.bed | grep -v -e 'chrM' | sort-bed - | bedops -n 1 - {5}bin/blacklist/{4}.blacklist.bed > {0}/{3}/{1}_summits_filtered_final.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME,CR_PATH)
+  FINAL_SUMMIT_FILTER_CMD = "cat {0}/{3}/{1}_summits_filtered.bed | grep -v -e 'chrM' | sort-bed - | bedops -n 1 - {5}/bin/blacklist/{4}.blacklist.bed > {0}/{3}/{1}_summits_filtered_final.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME,CR_PATH)
   os.system(FINAL_SUMMIT_FILTER_CMD)
 
   # Get 1000 random peaks from top 5000 peaks
