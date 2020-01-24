@@ -27,7 +27,7 @@ PATTERN         = args.pattern   #"P13556*.fastq.gz"
 OUTDIR          = args.out       #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/CR_pipeline_MB/"
 EXPERIMENT_NAME = args.name
 
-CR_PATH          = "~/CR_pipeline"
+CR_PATH          = "~/bin/CR_pipeline"
 TRIMMOMATIC      = "trimmomatic/0.36"
 SAMTOOLS         = "samtools/1.9"
 BOWTIE2          = "bowtie2/2.2.9"
