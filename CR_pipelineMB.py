@@ -185,7 +185,8 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                        SORT_ORDER=coordinate".format(PICARD_JAR_PATH,
                                                                      OUTDIR,
                                                                      EXPERIMENT_NAME)
-    
+  
+  # Picard mark is not run anymore (os.system(PICARD_MARK) to run it)
   PICARD_MARK = "java -jar {0} MarkDuplicates INPUT={1}/bowtie2_align/sorted/{2}_sorted.bam \
                                               OUTPUT={1}/bowtie2_align/sorted/{2}_marked-dup.bam \
                                               METRICS_FILE={1}/bowtie2_align/sorted/{2}_marked-dup_metrics.txt".format(PICARD_JAR_PATH,
@@ -201,23 +202,24 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   
   sys.stderr.write("*** {0} *** MB_pipeline: Sorting bam files {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
   #os.system(PICARD_SORT)
-  sys.stderr.write("*** {0} *** MB_pipeline: Marking duplicates {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  #os.system(PICARD_MARK)
+
+
   sys.stderr.write("*** {0} *** MB_pipeline: Removing duplicates {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
   #os.system(PICARD_REMOVE_DUP)
   
+  #################################### Filter <120bp reads (sub-nucleosome fraction)
   
   SAMTOOLS_120_FILTER_CMD          = "samtools view -h {0}/bowtie2_align/sorted/{1}_sorted.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_sorted_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE,CR_PATH)
   SAMTOOLS_120_FILTER_CMD_MARKED   = "samtools view -h {0}/bowtie2_align/sorted/{1}_marked-dup.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
   SAMTOOLS_120_FILTER_CMD_DEDUP    = "samtools view -h {0}/bowtie2_align/sorted/{1}_dedup.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
   
-  
   sys.stderr.write("*** {0} *** MB_pipeline: Extracting reads < 120 bp from {1} with {2} \n".format(datetime.now(),EXPERIMENT_NAME, SAMTOOLS))
+
   os.system(SAMTOOLS_120_FILTER_CMD)
-  os.system(SAMTOOLS_120_FILTER_CMD_MARKED)
   os.system(SAMTOOLS_120_FILTER_CMD_DEDUP)
   
-
+  
+  ###### Index all bam files
   
   INDEX1  =  "samtools index {0}/bowtie2_align/sorted/{1}_sorted.bam".format(OUTDIR,EXPERIMENT_NAME)
   INDEX2  =  "samtools index {0}/bowtie2_align/sorted/{1}_marked-dup.bam".format(OUTDIR,EXPERIMENT_NAME)
