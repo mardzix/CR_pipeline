@@ -40,7 +40,7 @@ MEME             = "MEMESuite/5.0.1"
 BEDTOOLS         = "BEDTools/2.27.1"
 OPENMPI          = "openmpi/3.1.1"
 
-NTHREADS         = 1
+NTHREADS         = 16
 BOWTIE2_INDEX    =  "/proj/uppstore2017150/private/marek/index/bowtie2/mm10_iGenomes/Mus_musculus/Ensembl/GRCm38/Sequence/Bowtie2Index/mm10"
 GENOME_FA        = "/proj/uppstore2017150/private/marek/index/bowtie2/mm10_iGenomes/Mus_musculus/Ensembl/GRCm38/Sequence/WholeGenomeFasta/genome.fa"
 #BOWTIE2_SPIKEIN  =  "/proj/uppstore2017150/private/marek/index/bowtie2/cerevisiae/s_cerevisiae"
