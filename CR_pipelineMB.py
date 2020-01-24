@@ -201,11 +201,11 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                                                                    EXPERIMENT_NAME)
   
   sys.stderr.write("*** {0} *** MB_pipeline: Sorting bam files {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  #os.system(PICARD_SORT)
+  os.system(PICARD_SORT)
 
 
   sys.stderr.write("*** {0} *** MB_pipeline: Removing duplicates {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  #os.system(PICARD_REMOVE_DUP)
+  os.system(PICARD_REMOVE_DUP)
   
   #################################### Filter <120bp reads (sub-nucleosome fraction)
   
