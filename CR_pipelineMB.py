@@ -20,14 +20,14 @@ parser.add_argument("-o","--output",dest="out",type=str,help="Output folder")
 parser.add_argument("-n","--name",dest="name",type=str,help="Name of the experiment",default=False)
 args = parser.parse_args()
 
-CR_PATH = "/".join(os.path.abspath(__file__).split("/")[0:-1])
+
 
 FASTQ_PATH      = args.input    #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/raw/P13556_1001/02-FASTQ/190625_A00621_0091_BHCKNLDRXX/"
 PATTERN         = args.pattern   #"P13556*.fastq.gz"
 OUTDIR          = args.out       #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/CR_pipeline_MB/"
 EXPERIMENT_NAME = args.name
 
-
+CR_PATH =        = "~/CR_pipeline"
 TRIMMOMATIC      = "trimmomatic/0.36"
 SAMTOOLS         = "samtools/1.9"
 BOWTIE2          = "bowtie2/2.2.9"
