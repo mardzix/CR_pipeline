@@ -352,49 +352,66 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   # MEME to search for motifs # TODO -> SIMPLIFY THIS?
   #############################
   
-  if not os.path.exists("{}/MEME.nodup/".format(OUTDIR)):
-    os.mkdir("{}/MEME.nodup/".format(OUTDIR))
+  MACS_INDIR = "macs.nodup"
+  MEME_OUTDIR = "MEME.nodup"
+
+  if not os.path.exists("{0}/{1}/".format(OUTDIR,MEME_OUTDIR)):
+    os.mkdir("{0}/{1}/".format(OUTDIR,MEME_OUTDIR))
   
+
+
   sys.stderr.write("*** {0} *** MB_pipeline: Preparing fasta files for motif search {1} using {2} \n".format(datetime.now(),EXPERIMENT_NAME,MEME))
-  
-  SUMMITS_PADDED_CMD = "bedops --range 150 -u {0}/macs.nodup/{1}_summits.bed  > {0}/MEME.nodup/{1}_summits_padded.bed".format(OUTDIR,EXPERIMENT_NAME)
-  #os.system(SUMMITS_PADDED_CMD)
-  
-  SUMMITS_PADDED_GETFASTA_CMD = "bedtools getfasta -fi {0} -bed {1}/MEME.nodup/{2}_summits_padded.bed -fo {1}/MEME.nodup/{2}_summits_padded.fa".format(GENOME_FA,OUTDIR,EXPERIMENT_NAME)
-  #os.system(SUMMITS_PADDED_GETFASTA_CMD)
-  
+
+  SUMMITS_PADDED_CMD = "bedops --range 150 -u {0}/{2}/{1}_summits.bed  > {0}/{3}/{1}_summits_padded.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
+  os.system(SUMMITS_PADDED_CMD)
+
+  SUMMITS_PADDED_GETFASTA_CMD = "bedtools getfasta -fi {0} -bed {1}/{3}/{4}_summits_padded.bed -fo {1}/{3}/{4}_summits_padded.fa".format(GENOME_FA,OUTDIR,MACS_INDIR,MEME_OUTDIR,EXPERIMENT_NAME)
+  os.system(SUMMITS_PADDED_GETFASTA_CMD)
+
   # Filte N and lower case atcg contatining fasta entries
-  FILTER_FA_CMD = "python ~/bin/filter.py {0}/MEME.nodup/{1}_summits_padded.fa 300 > {0}/MEME.nodup/{1}_summits_repeats.bed".format(OUTDIR,EXPERIMENT_NAME)
-  #os.system(FILTER_FA_CMD)
-  
-  SUMMITS_FILTER_CMD = "bedops -n 1 {0}/macs.nodup/{1}_summits.bed {0}/MEME.nodup/{1}_summits_repeats.bed | sort-bed - > {0}/MEME.nodup/{1}_summits_filtered.bed".format(OUTDIR,EXPERIMENT_NAME)
-  #os.system(SUMMITS_FILTER_CMD)
-  
+  FILTER_FA_CMD = "python ~/bin/filter.py {0}/{3}/{1}_summits_padded.fa 300 > {0}/{3}/{1}_summits_repeats.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
+  os.system(FILTER_FA_CMD)
+
+  SUMMITS_FILTER_CMD = "bedops -n 1 {0}/{2}/{1}_summits.bed {0}/{3}/{1}_summits_repeats.bed | sort-bed - > {0}/{3}/{1}_summits_filtered.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
+  os.system(SUMMITS_FILTER_CMD)
+
   # Filter blacklisted regions
-  FINAL_SUMMIT_FILTER_CMD = "cat {0}/MEME.nodup/{1}_summits_filtered.bed | grep -v -e 'chrM' | sort-bed - | bedops -n 1 - ~/bin/blacklist/{2}.blacklist.bed > {0}/MEME.nodup/{1}_summits_filtered_final.bed".format(OUTDIR,EXPERIMENT_NAME,GENOME)
-  #os.system(FINAL_SUMMIT_FILTER_CMD)
-  
+  FINAL_SUMMIT_FILTER_CMD = "cat {0}/{3}/{1}_summits_filtered.bed | grep -v -e 'chrM' | sort-bed - | bedops -n 1 - ~/bin/blacklist/{4}.blacklist.bed > {0}/{3}/{1}_summits_filtered_final.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME)
+  os.system(FINAL_SUMMIT_FILTER_CMD)
+
   # Get 1000 random peaks from top 5000 peaks
-  RANDOMIZE = "sort -k5gr {0}/MEME.nodup/{1}_summits_filtered.bed | head -5000 | shuf | head -1000 | sort-bed -  > {0}/MEME.nodup/{1}_1000_random_summits.bed".format(OUTDIR,EXPERIMENT_NAME) 
-  #os.system(RANDOMIZE)
-    
+  RANDOMIZE = "sort -k5gr {0}{3}/{1}_summits_filtered.bed | head -5000 | shuf | head -1000 | sort-bed -  > {0}/{3}/{1}_1000_random_summits.bed".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR) 
+  os.system(RANDOMIZE)
+  
   # Get fasta for random 1000 / top 5000
-  PICK_1000 = "sort -k5gr {0}/MEME.nodup/{1}_summits_filtered.bed | head -5000 | shuf | head -1000 | sort-bed -  > {0}/MEME.nodup/{1}_1000_random_summits.bed; \
-               bedops --range 150 -u {0}/MEME.nodup/{1}_1000_random_summits.bed > {0}/MEME.nodup/{1}_1000_random_summits_padded.bed; \
-               bedtools getfasta -fi {2} -bed {0}/MEME.nodup/{1}_1000_random_summits_padded.bed -fo {0}/MEME.nodup/{1}_1000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,GENOME_FA)
-  #os.system(PICK_1000)
-    
-  PICK_5000 = "sort -k5gr {0}/MEME.nodup/{1}_summits_filtered.bed | head -5000 | sort-bed -  > {0}/MEME.nodup/{1}_5000_random_summits.bed; \
-               bedops --range 150 -u {0}/MEME.nodup/{1}_5000_random_summits.bed > {0}/MEME.nodup/{1}_5000_random_summits_padded.bed; \
-               bedtools getfasta -fi {2} -bed {0}/MEME.nodup/{1}_5000_random_summits_padded.bed -fo {0}/MEME.nodup/{1}_5000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,GENOME_FA) 
-  #os.system(PICK_5000)
+  PICK_1000 = "sort -k5gr {0}/{3}/{1}_summits_filtered.bed | head -1000 | sort-bed -  > {0}/{3}/{1}_1000_random_summits.bed; \
+               bedops --range 150 -u {0}/{3}/{1}_1000_random_summits.bed > {0}/{3}/{1}_1000_random_summits_padded.bed; \
+               bedtools getfasta -fi {4} -bed {0}/{3}/{1}_1000_random_summits_padded.bed -fo {0}/{3}/{1}_1000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME_FA)
+  os.system(PICK_1000)
+  
+  PICK_5000 = "sort -k5gr {0}/{3}/{1}_summits_filtered.bed | head -5000 | sort-bed -  > {0}/{3}/{1}_5000_random_summits.bed; \
+               bedops --range 150 -u {0}/{3}/{1}_5000_random_summits.bed > {0}/{3}/{1}_5000_random_summits_padded.bed; \
+               bedtools getfasta -fi {4} -bed {0}/{3}/{1}_5000_random_summits_padded.bed -fo {0}/{3}/{1}_5000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME_FA)
+  os.system(PICK_5000)
+  
+  PICK_ALL = "bedops --range 150 -u {0}/{3}/{1}_summits_filtered.bed | sort-bed - > {0}/{3}/{1}_all_summits_padded.bed; \
+            bedtools getfasta -fi {4} -bed {0}/{3}/{1}_all_summits_padded.bed -fo {0}/{3}/{1}_all_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR,GENOME_FA)
+  os.system(PICK_ALL)
+
   
   sys.stderr.write("*** {0} *** MB_pipeline: Running motif search on {1} using {2} \n".format(datetime.now(),EXPERIMENT_NAME,MEME))    
-  
-  MEME_RUN = "meme-chip -oc {0}/MEME.nodup/MEME_1000/ -dreme-m 10 -meme-nmotifs 10 {0}/MEME.nodup/{1}_1000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME)
-  #os.system(MEME_RUN)
-  MEME_RUN_5000 = "meme-chip -oc {0}/MEME.nodup/MEME_5000/ -dreme-m 10 -meme-nmotifs 10 {0}/MEME.nodup/{1}_5000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME)
-  #os.system(MEME_RUN_5000)
+
+  MEME_RUN_1000 = "meme-chip -oc {0}/{3}/MEME_1000/ -dreme-m 10 -meme-nmotifs 10 {0}/{3}/{1}_1000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
+  os.system(MEME_RUN_1000 )
+
+  MEME_RUN_5000 = "meme-chip -oc {0}/{3}/MEME_5000/ -dreme-m 10 -meme-nmotifs 10 {0}/{3}/{1}_5000_random_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
+  os.system(MEME_RUN_5000)
+
+  MEME_RUN_ALL = "meme-chip -oc {0}/{3}/MEME_ALL/ -dreme-m 10 -meme-nmotifs 10 {0}/{3}/{1}_all_summits_padded.fa".format(OUTDIR,EXPERIMENT_NAME,MACS_INDIR,MEME_OUTDIR)
+  os.system(MEME_RUN_ALL)
+
+
+
 
   ########################################################################### 
   # MEME to search for motifs in < 120bp fragments # TODO -> SIMPLIFY THIS? #
