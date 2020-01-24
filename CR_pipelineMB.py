@@ -228,10 +228,8 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
 
   sys.stderr.write("*** {0} *** MB_pipeline: Indexing bam files from {1} with {2} \n".format(datetime.now(),EXPERIMENT_NAME, SAMTOOLS))  
   os.system(INDEX1)
-  os.system(INDEX2)
   os.system(INDEX3)
   os.system(INDEX4)
-  os.system(INDEX5)
   os.system(INDEX6)  
   
   ################################
