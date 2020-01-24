@@ -21,6 +21,8 @@ parser.add_argument("-n","--name",dest="name",type=str,help="Name of the experim
 
 args = parser.parse_args()
 
+CR_PATH = os.path.abspath(__file__)
+
 #sys.stdout.write(args.input)
 #sys.stdout.write(args.pattern)
 #sys.stdout.write(args.out)
@@ -211,9 +213,9 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   #os.system(PICARD_REMOVE_DUP)
   
   
-  SAMTOOLS_120_FILTER_CMD          = "samtools view -h {0}/bowtie2_align/sorted/{1}_sorted.bam | awk -f ~/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_sorted_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE)
-  SAMTOOLS_120_FILTER_CMD_MARKED   = "samtools view -h {0}/bowtie2_align/sorted/{1}_marked-dup.bam | awk -f ~/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE)
-  SAMTOOLS_120_FILTER_CMD_DEDUP    = "samtools view -h {0}/bowtie2_align/sorted/{1}_dedup.bam | awk -f ~/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE)
+  SAMTOOLS_120_FILTER_CMD          = "samtools view -h {0}/bowtie2_align/sorted/{1}_sorted.bam | awk -f {3}bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_sorted_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE,CR_PATH)
+  SAMTOOLS_120_FILTER_CMD_MARKED   = "samtools view -h {0}/bowtie2_align/sorted/{1}_marked-dup.bam | awk -f {3}bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
+  SAMTOOLS_120_FILTER_CMD_DEDUP    = "samtools view -h {0}/bowtie2_align/sorted/{1}_dedup.bam | awk -f {3}bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
   
   
   sys.stderr.write("*** {0} *** MB_pipeline: Extracting reads < 120 bp from {1} with {2} \n".format(datetime.now(),EXPERIMENT_NAME, SAMTOOLS))
@@ -346,7 +348,7 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   #os.system(HEATMAP_PLOT)
 
   #############################
-  # MEME to search for motifs # TODO -> SIMPLIFY THIS?
+  # MEME to search for motifs # 
   #############################
   
   MACS_INDIR = "macs.nodup"
