@@ -12,9 +12,6 @@ import fnmatch
 import argparse
 from datetime import datetime
 
-print("Hello world")
-
-
 parser = argparse.ArgumentParser("Cut and run pipeline")
 
 parser.add_argument("-i","--input",dest="input",type=str,help="Path to input file folder. The script will look into subfolders and retieve all fastq files")
