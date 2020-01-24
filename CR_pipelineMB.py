@@ -28,6 +28,7 @@ OUTDIR          = args.out       #"/proj/uppstore2017150/private/marek/G.Castelo
 EXPERIMENT_NAME = args.name
 
 CR_PATH          = "~/bin/CR_pipeline"
+
 TRIMMOMATIC      = "trimmomatic/0.36"
 SAMTOOLS         = "samtools/1.9"
 BOWTIE2          = "bowtie2/2.2.9"
@@ -256,12 +257,15 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   BIGWIG_CMD5 = "bamCoverage --scaleFactor {2} --numberOfProcessors {3} --ignoreDuplicates --minMappingQuality 5 -b {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam -o {0}/bigwig/{1}_marked-dup_120bp.bw --binSize 10 --centerReads --smoothLength 50" .format(OUTDIR,EXPERIMENT_NAME,SCALE_FACTOR,NTHREADS)
   BIGWIG_CMD6 = "bamCoverage --scaleFactor {2} --numberOfProcessors {3} --ignoreDuplicates --minMappingQuality 5 -b {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam -o {0}/bigwig/{1}_dedup_120bp.bw --binSize 10 --centerReads --smoothLength 50" .format(OUTDIR,EXPERIMENT_NAME,SCALE_FACTOR,NTHREADS)
   
+  BIGWIG_CMD_RPKM = "bamCoverage --normalizeUsing RPKM --numberOfProcessors {3} --ignoreDuplicates --minMappingQuality 5 -b {0}/bowtie2_align/sorted/{1}_dedup.bam -o {0}/bigwig/{1}_dedup_RPKM.bw --binSize 10 --centerReads --smoothLength 50" .format(OUTDIR,EXPERIMENT_NAME,SCALE_FACTOR,NTHREADS)
+  
   sys.stderr.write("*** {0} *** MB_pipeline: Generating bigwig files {1} using bamCoverage from {2} \n".format(datetime.now(),EXPERIMENT_NAME, DEEPTOOLS))    
   
   os.system(BIGWIG_CMD1)  
   os.system(BIGWIG_CMD3)
   os.system(BIGWIG_CMD4)
   os.system(BIGWIG_CMD6)
+  os.system(BIGWIG_CMD_RPKM)
   
   if not os.path.exists("{}/macs/".format(OUTDIR)):
     os.mkdir("{}/macs/".format(OUTDIR))
