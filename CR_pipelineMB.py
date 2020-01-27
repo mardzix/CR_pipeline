@@ -128,7 +128,7 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                                                                                                                       ADAPTER_PATH,
                                                                                                                                       NTHREADS)
   sys.stderr.write("*** {0} ***MB_pipeline: Performing trimming using {1}\n".format(datetime.now(),TRIMMOMATIC))
-  #os.system(TRIM_CMD)
+  os.system(TRIM_CMD)
   
   #############
   # Alignment #
@@ -168,11 +168,11 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   SPIKEIN_COUNT        = "samtools view -q 1 -f 2 {0}/bowtie2_align/{1}_spikein.bam | wc -l > {0}/bowtie2_align/{1}_spikein_norm.txt".format(OUTDIR,EXPERIMENT_NAME)
   
   sys.stderr.write("*** {0} *** MB_pipeline: Mapping trimmed reads with {1}\n".format(datetime.now(),BOWTIE2))
-  #os.system(BOWTIE_CMD)
+  os.system(BOWTIE_CMD)
   sys.stderr.write("*** {0} *** MB_pipeline: Mapping trimmed reads to the spike-in genome with {1}\n".format(datetime.now(),BOWTIE2))
-  #os.system(BOWTIE_SPIKEIN)
+  os.system(BOWTIE_SPIKEIN)
   sys.stderr.write("*** {0} *** MB_pipeline: Calculating spike-in normalisation factor {1}\n".format(datetime.now(),BOWTIE2))
-  #os.system(SPIKEIN_COUNT)
+  os.system(SPIKEIN_COUNT)
   
   #####################################
   # PICARD MANIPULATIONS OF BAM FILES #
@@ -211,8 +211,8 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   #################################### Filter <120bp reads (sub-nucleosome fraction)
   
   SAMTOOLS_120_FILTER_CMD          = "samtools view -h {0}/bowtie2_align/sorted/{1}_sorted.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_sorted_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE,CR_PATH)
-  SAMTOOLS_120_FILTER_CMD_MARKED   = "samtools view -h {0}/bowtie2_align/sorted/{1}_marked-dup.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
-  SAMTOOLS_120_FILTER_CMD_DEDUP    = "samtools view -h {0}/bowtie2_align/sorted/{1}_dedup.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, SIZE,CR_PATH)
+  SAMTOOLS_120_FILTER_CMD_MARKED   = "samtools view -h {0}/bowtie2_align/sorted/{1}_marked-dup.bam | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_marked-dup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE,CR_PATH)
+  SAMTOOLS_120_FILTER_CMD_DEDUP    = "samtools view -h {0}/bowtie2_align/sorted/{1}_dedup.bam  | awk -f {3}/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE, CR_PATH)
   
   sys.stderr.write("*** {0} *** MB_pipeline: Extracting reads < 120 bp from {1} with {2} \n".format(datetime.now(),EXPERIMENT_NAME, SAMTOOLS))
 
@@ -339,8 +339,9 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
 
   # Plot heatmap of reads around the called peaks
   sys.stderr.write("*** {0} *** MB_pipeline: Plotting heatmap around peaks for {1} \n".format(datetime.now(),EXPERIMENT_NAME,MACS))    
-  HEATMAP_PLOT = "computeMatrix reference-point -S {0}/bigwig/{1}.bw -R {0}/macs.nodup/{1}_summits.bed -a 1000 -b 1000 -out {0}/macs.nodup/{1}_matrix -bs 25 -p 6 --missingDataAsZero; \
-  plotHeatmap -m {0}/macs.nodup/{1}_matrix --colorList blue,yellow,red --heatmapHeight 25 --heatmapWidth 5 --samplesLabel {1} -out {0}/macs.nodup/{1}_matrix.png --whatToShow 'heatmap and colorbar'  --sortUsing max  --refPointLabel ' ' ".format(OUTDIR,EXPERIMENT_NAME)
+  
+  HEATMAP_PLOT = "computeMatrix reference-point -S {0}/bigwig/{1}_dedup.bw -R {0}/macs.nodup/{1}_summits.bed -a 1000 -b 1000 -out {0}/macs.nodup/{1}_matrix -bs 25 -p 1 --missingDataAsZero; \
+  plotHeatmap -m {0}/macs.nodup/{1}_matrix --colorList blue,yellow,red --heatmapHeight 25 --heatmapWidth 5 --samplesLabel {1} -out {0}/macs.nodup/{1}_matrix.png --whatToShow 'heatmap and colorbar'  --sortUsing max  --refPointLabel '' ".format(OUTDIR,EXPERIMENT_NAME)
   os.system(HEATMAP_PLOT)
 
   #############################
