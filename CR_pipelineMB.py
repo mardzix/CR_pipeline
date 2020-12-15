@@ -21,14 +21,10 @@ parser.add_argument("-n","--name",dest="name",type=str,help="Name of the experim
 
 args = parser.parse_args()
 
-#sys.stdout.write(args.input)
-#sys.stdout.write(args.pattern)
-#sys.stdout.write(args.out)
-#sys.exit(1)
 
-FASTQ_PATH      = args.input    #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/raw/P13556_1001/02-FASTQ/190625_A00621_0091_BHCKNLDRXX/"
-PATTERN         = args.pattern   #"P13556*.fastq.gz"
-OUTDIR          = args.out       #"/proj/uppstore2017150/private/marek/G.CasteloBranco_19_05-P13556/CR_pipeline_MB/"
+FASTQ_PATH      = args.input
+PATTERN         = args.pattern
+OUTDIR          = args.out
 EXPERIMENT_NAME = args.name
 
 
@@ -131,7 +127,7 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                                                                                                                       ADAPTER_PATH,
                                                                                                                                       NTHREADS)
   sys.stderr.write("*** {0} ***MB_pipeline: Performing trimming using {1}\n".format(datetime.now(),TRIMMOMATIC))
-  #os.system(TRIM_CMD)
+  os.system(TRIM_CMD)
   
   #############
   # Alignment #
@@ -171,11 +167,11 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   SPIKEIN_COUNT        = "samtools view -q 1 -f 2 {0}/bowtie2_align/{1}_spikein.bam | wc -l > {0}/bowtie2_align/{1}_spikein_norm.txt".format(OUTDIR,EXPERIMENT_NAME)
   
   sys.stderr.write("*** {0} *** MB_pipeline: Mapping trimmed reads with {1}\n".format(datetime.now(),BOWTIE2))
-  #os.system(BOWTIE_CMD)
+  os.system(BOWTIE_CMD)
   sys.stderr.write("*** {0} *** MB_pipeline: Mapping trimmed reads to the spike-in genome with {1}\n".format(datetime.now(),BOWTIE2))
-  #os.system(BOWTIE_SPIKEIN)
+  os.system(BOWTIE_SPIKEIN)
   sys.stderr.write("*** {0} *** MB_pipeline: Calculating spike-in normalisation factor {1}\n".format(datetime.now(),BOWTIE2))
-  #os.system(SPIKEIN_COUNT)
+  os.system(SPIKEIN_COUNT)
   
   #####################################
   # PICARD MANIPULATIONS OF BAM FILES #
@@ -204,11 +200,11 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                                                                    EXPERIMENT_NAME)
   
   sys.stderr.write("*** {0} *** MB_pipeline: Sorting bam files {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  #os.system(PICARD_SORT)
+  os.system(PICARD_SORT)
   sys.stderr.write("*** {0} *** MB_pipeline: Marking duplicates {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  #os.system(PICARD_MARK)
+  os.system(PICARD_MARK)
   sys.stderr.write("*** {0} *** MB_pipeline: Removing duplicates {1} with {2}\n".format(datetime.now(),EXPERIMENT_NAME,PICARD))
-  #os.system(PICARD_REMOVE_DUP)
+  os.system(PICARD_REMOVE_DUP)
   
   
   SAMTOOLS_120_FILTER_CMD          = "samtools view -h {0}/bowtie2_align/sorted/{1}_sorted.bam | awk -f ~/bin/filter_below.awk | samtools view -bS - > {0}/bowtie2_align/sorted/{1}_sorted_120bp.bam".format(OUTDIR, EXPERIMENT_NAME, SIZE)
@@ -217,9 +213,9 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   
   
   sys.stderr.write("*** {0} *** MB_pipeline: Extracting reads < 120 bp from {1} with {2} \n".format(datetime.now(),EXPERIMENT_NAME, SAMTOOLS))
-  #os.system(SAMTOOLS_120_FILTER_CMD)
-  #os.system(SAMTOOLS_120_FILTER_CMD_MARKED)
-  #os.system(SAMTOOLS_120_FILTER_CMD_DEDUP)
+  os.system(SAMTOOLS_120_FILTER_CMD)
+  os.system(SAMTOOLS_120_FILTER_CMD_MARKED)
+  os.system(SAMTOOLS_120_FILTER_CMD_DEDUP)
   
 
   
@@ -231,12 +227,12 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   INDEX6  =  "samtools index {0}/bowtie2_align/sorted/{1}_dedup_120bp.bam".format(OUTDIR,EXPERIMENT_NAME)
 
   sys.stderr.write("*** {0} *** MB_pipeline: Indexing bam files from {1} with {2} \n".format(datetime.now(),EXPERIMENT_NAME, SAMTOOLS))  
-  #os.system(INDEX1)
-  #os.system(INDEX2)
-  #os.system(INDEX3)
-  #os.system(INDEX4)
-  #os.system(INDEX5)
-  #os.system(INDEX6)  
+  os.system(INDEX1)
+  os.system(INDEX2)
+  os.system(INDEX3)
+  os.system(INDEX4)
+  os.system(INDEX5)
+  os.system(INDEX6)  
   
   ################################
   # Create bw for genome browser #
@@ -262,12 +258,12 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
   
   sys.stderr.write("*** {0} *** MB_pipeline: Generating bigwig files {1} using bamCoverage from {2} \n".format(datetime.now(),EXPERIMENT_NAME, DEEPTOOLS))    
   
-  #os.system(BIGWIG_CMD1)  
-#  #os.system(BIGWIG_CMD2)  
-  #os.system(BIGWIG_CMD3)
-  #os.system(BIGWIG_CMD4)
-#  #os.system(BIGWIG_CMD5)
-  #os.system(BIGWIG_CMD6)
+  os.system(BIGWIG_CMD1)  
+#  os.system(BIGWIG_CMD2)  
+  os.system(BIGWIG_CMD3)
+  os.system(BIGWIG_CMD4)
+#  os.system(BIGWIG_CMD5)
+  os.system(BIGWIG_CMD6)
   
   if not os.path.exists("{}/macs/".format(OUTDIR)):
     os.mkdir("{}/macs/".format(OUTDIR))
@@ -333,17 +329,17 @@ def main(OUTDIR=OUTDIR,PATTERN=PATTERN,FASTQ_PATH=FASTQ_PATH,EXPERIMENT_NAME=EXP
                                         --keep-dup all 2>&1".format(OUTDIR,EXPERIMENT_NAME,GENOME.rstrip("0123456789"))
   
   sys.stderr.write("*** {0} *** MB_pipeline: Peak calling for {1} using {2} \n".format(datetime.now(),EXPERIMENT_NAME,MACS))    
-  #os.system(MACS_CMD)
-  #os.system(MACS_CMD_BROAD)
-  #os.system(MACS_CMD_DEDUP)
-  #os.system(MACS_CMD_DEDUP_BROAD)
-  #os.system(MACS_CMD_DEDUP_120)
+  os.system(MACS_CMD)
+  os.system(MACS_CMD_BROAD)
+  os.system(MACS_CMD_DEDUP)
+  os.system(MACS_CMD_DEDUP_BROAD)
+  os.system(MACS_CMD_DEDUP_120)
 
   # Plot heatmap of reads around the called peaks
   sys.stderr.write("*** {0} *** MB_pipeline: Plotting heatmap around peaks for {1} \n".format(datetime.now(),EXPERIMENT_NAME,MACS))    
   HEATMAP_PLOT = "computeMatrix reference-point -S {0}/bigwig/{1}.bw -R {0}/macs.nodup/{1}_summits.bed -a 1000 -b 1000 -out {0}/macs.nodup/{1}_matrix -bs 25 -p 6 --missingDataAsZero; \
   plotHeatmap -m {0}/macs.nodup/{1}_matrix --colorList blue,yellow,red --heatmapHeight 25 --heatmapWidth 5 --samplesLabel {1} -out {0}/macs.nodup/{1}_matrix.png --whatToShow 'heatmap and colorbar'  --sortUsing max  --refPointLabel ' ' ".format(OUTDIR,EXPERIMENT_NAME)
-  #os.system(HEATMAP_PLOT)
+  os.system(HEATMAP_PLOT)
 
   #############################
   # MEME to search for motifs # TODO -> SIMPLIFY THIS?
